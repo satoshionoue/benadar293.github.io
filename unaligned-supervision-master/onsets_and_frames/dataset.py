@@ -55,8 +55,8 @@ class EMDATASET(Dataset):
         return len(self.data)
 
     def files(self, groups):
-        self.path = 'NoteEM_audio'
-        tsvs_path = 'NoteEM_tsv'
+        self.path = 'unaligned-supervision-master/NoteEM_audio'
+        tsvs_path = 'unaligned-supervision-master/NoteEM_tsv'
         res = []
         good_ids = list(range(2075, 2084))
         # good_ids += list(range(1817, 1820))
@@ -301,11 +301,15 @@ class EMDATASET(Dataset):
             onset_label_comp = compress_time(onset_label_comp, DTW_FACTOR)
             print('dtw lengths', len(onset_pred_comp), len(onset_label_comp))
             init_time = time.time()
-            alignment = dtw(onset_pred_comp, onset_label_comp, dist_method='euclidean',
+            # alignment = dtw(onset_pred_comp, onset_label_comp, dist_method='euclidean',
+            #                 )
+            alignment = dtw(onset_pred_comp, onset_label_comp, lambda x, y: np.linalg.norm(x - y),
                             )
             finish_time = time.time()
             print('DTW took {} seconds.'.format(finish_time - init_time))
-            index1, index2 = alignment.index1, alignment.index2
+            # index1, index2 = alignment.index1, alignment.index2
+            path = alignment[-1]
+            index1, index2 = path
             matches1, matches2 = get_matches(index1, index2), get_matches(index2, index1)
 
             aligned_onsets = np.zeros(onset_pred_np.shape, dtype=bool)

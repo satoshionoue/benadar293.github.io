@@ -1,0 +1,10 @@
+.vscode
+runs
+unaligned-supervision-master/ckpts
+unaligned-supervision-master/datasets
+unaligned-supervision-master/NoteEM_tsv
+unaligned-supervision-master/NoteEM_audio
+unaligned-supervision-master/onsets_and_frames/__pycache__
+venv
+*.mid
+*.wav

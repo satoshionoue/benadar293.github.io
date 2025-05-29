@@ -26,7 +26,7 @@ ex = Experiment('train_transcriber')
 @ex.config
 def config():
     logdir = 'runs/transcriber-' + datetime.now().strftime('%y%m%d-%H%M%S') # ckpts and midi will be saved here
-    transcriber_ckpt = 'ckpts/model_512.pt'
+    transcriber_ckpt = 'unaligned-supervision-master/ckpts/model_64.pt'
     multi_ckpt = False # Flag if the ckpt was trained on pitch only or instrument-sensitive. The provided checkpoints were trained on pitch only.
 
     # transcriber_ckpt = 'ckpts/'
@@ -52,13 +52,13 @@ def train(logdir, device, iterations, checkpoint_interval, batch_size, sequence_
 
     print_config(ex.current_run)
     os.makedirs(logdir, exist_ok=True)
-    train_data_path = '/disk4/ben/UnalignedSupervision/NoteEM_audio'
-    labels_path = '/disk4/ben/UnalignedSupervision/NoteEm_labels'
+    train_data_path = 'unaligned-supervision-master/NoteEM_audio'
+    labels_path = 'unaligned-supervision-master/NoteEM_tsv'
     # labels_path = '/disk4/ben/UnalignedSupervision/NoteEm_512_labels'
 
     os.makedirs(labels_path, exist_ok=True)
 
-    train_groups = ['Bach Brandenburg Concerto 1 A']
+    train_groups = ['datasets']
 
     conversion_map = None
     instrument_map = None
@@ -75,8 +75,8 @@ def train(logdir, device, iterations, checkpoint_interval, batch_size, sequence_
 
     #####
     if not multi_ckpt:
-        model_complexity = 64 if '512' in transcriber_ckpt else 48
-        saved_transcriber = torch.load(transcriber_ckpt).cpu()
+        model_complexity = 64# if '512' in transcriber_ckpt else 48
+        saved_transcriber = torch.load(transcriber_ckpt, weights_only=False).cpu()
         # We create a new transcriber with N_KEYS classes for each instrument:
         transcriber = OnsetsAndFrames(N_MELS, (MAX_MIDI - MIN_MIDI + 1),
                                               model_complexity,
@@ -85,7 +85,7 @@ def train(logdir, device, iterations, checkpoint_interval, batch_size, sequence_
         load_weights(transcriber, saved_transcriber, n_instruments=len(dataset.instruments) + 1)
     else:
         # The checkpoint is already instrument-sensitive
-        transcriber = torch.load(transcriber_ckpt).to(device)
+        transcriber = torch.load(transcriber_ckpt, weights_only=False).to(device)
 
     # We recommend to train first only onset detection. This will already give good note durations because the combined stack receives
     # information from the onset stack
@@ -101,7 +101,7 @@ def train(logdir, device, iterations, checkpoint_interval, batch_size, sequence_
     # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min')
     for epoch in range(1, epochs + 1):
         if epoch == 1:
-            ghost = torch.ones((100, 100), dtype=float).to('cuda:1') # occupy another gpu until transcriber training begins
+            ghost = torch.ones((100, 100), dtype=float).to('cuda:0') # occupy another gpu until transcriber training begins
         print('epoch', epoch)
         if epoch > 1:
             del loader

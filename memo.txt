@@ -1,0 +1,25 @@
+1. 仮想環境の構築
+python3 -m venv venv
+source venv/bin/activate
+
+2. requirements.txtに書かれているライブラリのインストール
+pip install -r unaligned-supervision-master/requirements.txt
+
+3. make_pitch_shifted_copies.pyの実行
+
+4. make_parsed_tsv_from_midi.pyの実行
+    （発生した問題）
+    - librosaのバージョンが違うため、mel.pyの
+        - pad_center()
+        - mel()
+    　の引数の渡し方が違ったので修正した
+
+5. train.pyの実行
+    (発生した問題)
+    - labels_pathがtsvのディレクトリへのパスであるということ
+    - チェックポイントファイルをダウンロードしてckpts下に置かないといけない
+    - チェックポイントファイルがgpuで作成されたものだからmac上では修正しないといけない
+    - データ数10で1時間50分かかった...
+
+6. 推論
+    - 推論用コードがない→transcribe.py

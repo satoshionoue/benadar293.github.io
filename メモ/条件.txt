@@ -1,0 +1,55 @@
+logdir:
+チェックポイントやMIDIファイルの保存先ディレクトリ。
+例: runs/transcriber-240517-153012（日付と時刻で自動生成）
+
+transcriber_ckpt:
+事前学習済みモデルのパス。
+例: model_64.pt
+
+multi_ckpt:
+チェックポイントがピッチのみか楽器識別も含むかのフラグ。
+デフォルトは False（ピッチのみ）
+
+device:
+使用デバイス。CUDAが利用可能なら 'cuda'、そうでなければ 'cpu'
+
+checkpoint_interval:
+チェックポイントの保存間隔（エポック数）。
+デフォルトは 6
+
+batch_size:
+バッチサイズ。デフォルトは 8
+
+sequence_length:
+シーケンス長。SEQ_LEN（定数）
+
+iterations:
+1エポックあたりのイテレーション数。デフォルトは 1000
+
+learning_rate:
+学習率。デフォルトは 0.0001
+
+learning_rate_decay_steps:
+学習率減衰のステップ数。デフォルトは 10000
+
+clip_gradient_norm:
+勾配クリッピングの有無。デフォルトは False（または値を指定）
+
+epochs:
+総エポック数。デフォルトは 15
+
+ex.observers.append(FileStorageObserver.create(logdir))
+Sacredの実験ログ保存先を設定
+
+データセット
+jpopのmidiファイルとそれをクラリネットのwav音源にしたもののペア10組
+
+学習時間
+2時間弱
+
+新しいアラインメントMIDIと予測MIDIを出力した
+
+クラリネットの音源/MIDIデータセット
+1. すでにあるデータセットを使う
+2. ネット上の音源と対応する楽譜を集める（rose32）
+3. 自前で作る
